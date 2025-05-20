@@ -11,8 +11,6 @@ services:
       - "${DB_PORT}:5432"
     volumes:
       - postgres_data_de:/var/lib/postgresql/data
-    networks:
-      - internal
     healthcheck:
       test:
         [
@@ -23,5 +21,16 @@ services:
       timeout: 10s
       retries: 5
 
+  redis:
+    image: redis
+    container_name: de-redis
+    restart: always
+    ports:
+      - "6379:6379"
+    command: redis-server --save 60 1 --loglevel warning  
+    volumes:
+      - redis_data:/data
+
 volumes:
   postgres_data_de:
+  redis_data:
