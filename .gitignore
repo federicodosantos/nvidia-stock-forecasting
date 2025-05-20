@@ -1,2 +1,5 @@
 .venv
 .env
+
+src/db/__pycache__
+src/etl/__pycache__

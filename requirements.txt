@@ -3,3 +3,4 @@ pyspark
 finnhub-python
 python-dotenv
 redis
+sqlalchemy
