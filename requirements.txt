@@ -2,3 +2,4 @@ websocket-client
 pyspark
 finnhub-python
 python-dotenv
+redis
