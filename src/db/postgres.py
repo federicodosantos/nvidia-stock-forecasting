@@ -5,7 +5,7 @@ from sqlalchemy import create_engine, MetaData, Table, Column, Integer, String, 
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.sql import func
 from datetime import datetime
-from db.model import Base
+from src.db.model import Base
 
 class PostgresDB:
     def __init__(self):

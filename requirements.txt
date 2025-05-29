@@ -4,3 +4,8 @@ finnhub-python
 python-dotenv
 redis
 sqlalchemy
+statsmodels
+pmdarima
+dotenv
+psycopg2-binary
+matplotlib

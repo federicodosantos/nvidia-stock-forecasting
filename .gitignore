@@ -1,5 +1,8 @@
 .venv
 .env
 
+src/__pycache__
 src/db/__pycache__
 src/etl/__pycache__
+src/ml/__pycache__
+src/ml/result
