@@ -1,8 +1,8 @@
-from etl.extract import extract_from_redis
-from etl.transform import transform_to_ohlcv
-from etl.load import load_to_postgres
-from db.model import StockOHLCV
-from db.postgres import PostgresDB
+from src.etl.extract import extract_from_redis
+from src.etl.transform import transform_to_ohlcv
+from src.etl.load import load_to_postgres
+from src.db.model import StockOHLCV
+from src.db.postgres import PostgresDB
 
 def run_etl(db):
     data = extract_from_redis()
