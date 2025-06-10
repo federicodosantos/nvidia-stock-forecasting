@@ -1,5 +1,7 @@
 # 📈 Nvidia Stock Forecasting
-This project is an end-to-end **data engineering pipeline** that collects real-time Nvidia stock price data, transforms it into structured time-series format, and stores it for analysis and forecasting. The system is built using modern data tools including Redis Streams, Apache Spark, Airflow, Docker and PostgreSQL.
+This project is an end-to-end **data engineering pipeline** designed to collect real-time stock price data for Nvidia via WebSocket from the Finnhub API. The collected data is temporarily streamed into Redis-Stream and held there until the U.S. stock market closes.
+
+At the end of the trading day, the system performs **batch processing** using Apache Spark to aggregate and transform the raw tick data into structured hourly time-series format. The transformed data is stored in PostgreSQL for further analysis, visualization (with Matplotlib and Seaborn), and forecasting using an ARIMA model. The pipeline is orchestrated with Apache Airflow and the insights are presented via an interactive Streamlit dashboard.
 
 ## 🧰 Tools
 
