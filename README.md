@@ -38,19 +38,24 @@ Follow these steps to set up and run our project on your local machine.
     pip install -r requirements.txt
 ```
 
-4. Before running the etl pipeline, make sure you have the **API KEY** from finnhub and put it in the .env file. 
+4. Before running the program, make sure you have the **API KEY** from finnhub and put it in the .env file. 
 
-5. There is one more step before we can run the etl pipeline and training code. We have to docker compose up so that tools like redis stream, postgreSQL, and Apache Airflow can be used. You can run the following command.
+5. There is one more step before we can run the data ingestion code (websocket), etl pipeline and model training. We need to compose up the docker compose so that tools like redis streams, postgreSQL, and Apache Airflow can be used. You can run the following command.
 ```sh
     docker-compose up -d
 ```
 
-6. to run the etl pipeline, you can run the main.py file in the src directory
+6. To start the websocket retrieving nvidia stock data from the finnhub API, you need to run the **data_ingestion.py** file in the src/etl directory
+```sh
+    python -m src.etl.data_ingestion
+```
+
+7. To run the etl pipeline, you can run the **main.py** file in the src directory
 ```sh
     python -m src.main
 ```
 
-7. To run the model training script, you can run the run.py file in the src/ml directory.
+8. To run the model training script, you can run the **run.py** file in the src/ml directory.
 ```sh
     python -m src.ml.run
 ```
