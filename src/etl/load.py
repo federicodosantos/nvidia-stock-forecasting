@@ -1,5 +1,5 @@
-from src.db.postgres import PostgresDB
-from src.db.model import StockOHLCV
+from db.postgres import PostgresDB
+from db.model import StockOHLCV
 from datetime import datetime
 
 def load_to_postgres(df, db):

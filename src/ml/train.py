@@ -5,8 +5,8 @@ from statsmodels.tsa.stattools import adfuller
 from statsmodels.graphics.tsaplots import plot_acf, plot_pacf
 import matplotlib.pyplot as plt
 from sklearn.metrics import mean_squared_error, mean_absolute_error
-from src.db.postgres import PostgresDB
-from src.db.model import StockOHLCV
+from db.postgres import PostgresDB
+from db.model import StockOHLCV
 import os
 
 class ARIMAStockForecaster:
