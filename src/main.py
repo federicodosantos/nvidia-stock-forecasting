@@ -1,8 +1,8 @@
-from src.etl.extract import extract_from_redis
-from src.etl.transform import transform_to_ohlcv
-from src.etl.load import load_to_postgres
-from src.db.model import StockOHLCV
-from src.db.postgres import PostgresDB
+from etl.extract import extract_from_redis
+from etl.transform import transform_to_ohlcv
+from etl.load import load_to_postgres
+from db.model import StockOHLCV
+from db.postgres import PostgresDB
 
 def run_etl(db):
     data = extract_from_redis()
@@ -13,9 +13,10 @@ def run_etl(db):
     else:
         print("No data to process.")
 
-if __name__ == "__main__":
+def run_transform_load():
     db = PostgresDB()
     if db.connect():
         db.create_tables()
         run_etl(db)
         db.disconnect()
+    

@@ -5,7 +5,10 @@ from sqlalchemy import create_engine, MetaData, Table, Column, Integer, String, 
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.sql import func
 from datetime import datetime
-from src.db.model import Base
+from db.model import Base
+import logging
+
+load_dotenv()
 
 class PostgresDB:
     def __init__(self):
@@ -15,8 +18,8 @@ class PostgresDB:
         self.db_name = os.getenv("DB_NAME")
         self.db_user = os.getenv("DB_USERNAME")
         self.db_password = os.getenv("DB_PASSWORD")
-        self.host = os.getenv("DB_HOST", "localhost")
-        self.port = os.getenv("DB_PORT", "5432")
+        self.host = os.getenv("DB_HOST")
+        self.port = os.getenv("DB_PORT")
         
         self.engine = None
         self.session = None
@@ -25,6 +28,7 @@ class PostgresDB:
     def connect(self):
         """Membuat koneksi ke database menggunakan SQLAlchemy"""
         try:
+            logging.info("connected")
             connection_string = f"postgresql://{self.db_user}:{self.db_password}@{self.host}:{self.port}/{self.db_name}"
             self.engine = create_engine(connection_string)
             

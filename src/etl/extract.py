@@ -2,7 +2,7 @@ import redis
 import json
 
 def extract_from_redis(stream_name="finnhub_stream", count=10000):
-    r = redis.Redis(host="localhost", port=6379, db=0)
+    r = redis.Redis(host="nvidia-stock-forecasting-redis-1", port=6379, db=0)
     stream_data = r.xread({stream_name: '0'}, count=count)
     
     records = []
