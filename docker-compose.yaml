@@ -50,7 +50,7 @@ x-airflow-common:
   # Comment the image line, place your Dockerfile in the directory where you placed the docker-compose.yaml
   # and uncomment the "build" line below, Then run `docker-compose build` to build the images.
   image: ${AIRFLOW_IMAGE_NAME:-apache/airflow:3.0.1}
-  # build: .
+  build: .
   environment:
     &airflow-common-env
     AIRFLOW__CORE__EXECUTOR: CeleryExecutor
@@ -69,11 +69,12 @@ x-airflow-common:
     AIRFLOW__SCHEDULER__ENABLE_HEALTH_CHECK: 'true'
     # WARNING: Use _PIP_ADDITIONAL_REQUIREMENTS option ONLY for a quick checks
     # for other purpose (development, test and especially production usage) build/extend Airflow image.
-    _PIP_ADDITIONAL_REQUIREMENTS: ${_PIP_ADDITIONAL_REQUIREMENTS:-}
+    # MODIFIED LINE: Added apache-airflow-providers-apache-spark as default
+    _PIP_ADDITIONAL_REQUIREMENTS: ${_PIP_ADDITIONAL_REQUIREMENTS:-apache-airflow-providers-apache-spark statsmodels matplotlib pandas numpy}
     # The following line can be used to set a custom config file, stored in the local config folder
     AIRFLOW_CONFIG: '/opt/airflow/config/airflow.cfg'
   volumes:
-    - ${AIRFLOW_PROJ_DIR:-.}/src:/opt/airflow/dags
+    - ${AIRFLOW_PROJ_DIR:-.}/src:/opt/airflow/src
     - ${AIRFLOW_PROJ_DIR:-.}/logs:/opt/airflow/logs
     - ${AIRFLOW_PROJ_DIR:-.}/config:/opt/airflow/config
     - ${AIRFLOW_PROJ_DIR:-.}/plugins:/opt/airflow/plugins
@@ -93,10 +94,14 @@ services:
       POSTGRES_USER: airflow
       POSTGRES_PASSWORD: airflow
       POSTGRES_DB: airflow
+      FORECASTING_USER: ${FORECASTING_DB_USER}
+      FORECASTING_PASSWORD: ${FORECASTING_DB_PASSWORD}
+      FORECASTING_DB: ${FORECASTING_DB_NAME}
     ports:
       - "${DB_PORT}:5432"
     volumes:
       - postgres-db-volume:/var/lib/postgresql/data
+      - ./init-db:/docker-entrypoint-initdb.d
     healthcheck:
       test:
         [
@@ -294,12 +299,13 @@ services:
 
     # yamllint enable rule:line-length
     environment:
-      <<: *airflow-common-env
+      <<: *airflow-common-env # Inherits _PIP_ADDITIONAL_REQUIREMENTS from common-env
       _AIRFLOW_DB_MIGRATE: 'true'
       _AIRFLOW_WWW_USER_CREATE: 'true'
       _AIRFLOW_WWW_USER_USERNAME: ${_AIRFLOW_WWW_USER_USERNAME:-airflow}
       _AIRFLOW_WWW_USER_PASSWORD: ${_AIRFLOW_WWW_USER_PASSWORD:-airflow}
-      _PIP_ADDITIONAL_REQUIREMENTS: ''
+      # REMOVED LINE (optional): _PIP_ADDITIONAL_REQUIREMENTS: 'apache-airflow-providers-apache-spark'
+      # It's now handled by the default in &airflow-common-env
     user: "0:0"
 
   airflow-cli:
@@ -307,7 +313,7 @@ services:
     profiles:
       - debug
     environment:
-      <<: *airflow-common-env
+      <<: *airflow-common-env # Inherits _PIP_ADDITIONAL_REQUIREMENTS from common-env
       CONNECTION_CHECK_MAX_COUNT: "0"
     # Workaround for entrypoint issue. See: https://github.com/apache/airflow/issues/16252
     command:
@@ -321,7 +327,7 @@ services:
   # or by explicitly targeted on the command line e.g. docker-compose up flower.
   # See: https://docs.docker.com/compose/profiles/
   flower:
-    <<: *airflow-common
+    <<: *airflow-common # Inherits _PIP_ADDITIONAL_REQUIREMENTS from common-env via *airflow-common
     command: celery flower
     profiles:
       - flower
@@ -341,4 +347,3 @@ services:
 
 volumes:
   postgres-db-volume:
-
