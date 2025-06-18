@@ -10,3 +10,5 @@ pmdarima==2.0.4
 dotenv==0.9.9
 psycopg2-binary==2.9.10
 matplotlib==3.10.3
+plotly==6.1.2
+streamlit==1.45.1
