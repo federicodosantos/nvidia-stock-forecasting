@@ -54,7 +54,7 @@ def run_data_ingestion_callable(**kwargs):
             sys.path.insert(0, project_root)
         
         # Import modul ETL
-        from etl import data_ingestion
+        from src.etl import data_ingestion
         logger.info("Successfully imported data_ingestion module")
         
         # Jalankan proses ETL
@@ -78,7 +78,7 @@ def stop_data_ingestion_callable(**kwargs):
             sys.path.insert(0, project_root)
         
         # Import modul ETL
-        from etl import data_ingestion
+        from src.etl import data_ingestion
         logger.info("Successfully imported data_ingestion module")
         
         # Jalankan proses ETL

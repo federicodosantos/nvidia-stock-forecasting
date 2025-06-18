@@ -5,7 +5,7 @@ from sqlalchemy import create_engine, MetaData, Table, Column, Integer, String, 
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.sql import func
 from datetime import datetime
-from db.model import Base
+from src.db.model import Base
 import logging
 
 load_dotenv()
@@ -28,7 +28,7 @@ class PostgresDB:
     def connect(self):
         """Membuat koneksi ke database menggunakan SQLAlchemy"""
         try:
-            logging.info("connected")
+            logging.info("creating postgres database connection...")
             connection_string = f"postgresql://{self.db_user}:{self.db_password}@{self.host}:{self.port}/{self.db_name}"
             self.engine = create_engine(connection_string)
             

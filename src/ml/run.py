@@ -2,7 +2,7 @@ import os
 import logging
 from pyspark.sql import SparkSession
 from dotenv import load_dotenv
-from ml.train import ARIMAStockForecaster
+from src.ml.train import ARIMAStockForecaster
 import pandas as pd
 
 # Load environment variables

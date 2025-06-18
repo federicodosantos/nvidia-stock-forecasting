@@ -28,11 +28,11 @@ def run_ml_training_callable(**kwargs):
         
         # --- GANTI BAGIAN INI ---
         # Ganti 'ml_training_script' dengan nama file script ML Anda
-        import ml.run 
+        import src.ml.run 
         logger.info("Successfully imported ML training module (ml_training_script).")
         
         # Ganti 'run_training' dengan nama fungsi utama untuk training di dalam script Anda
-        ml.run.main()
+        src.ml.run.main()
         # --------------------------
 
         logger.info("Machine learning training task finished successfully.")
