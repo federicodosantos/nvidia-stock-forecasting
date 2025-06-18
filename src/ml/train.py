@@ -27,14 +27,19 @@ class ARIMAStockForecaster:
         db = PostgresDB()
         if db.connect():
             records = db.read_records(StockOHLCV)
+
+            if not records:
+            # Berhenti lebih awal dengan pesan yang jelas jika tidak ada data.
+            # Cek log Anda untuk pesan "Error reading records:" jika Anda mencurigai ada error DB.
+                raise ValueError("Gagal memuat data dari database. Tidak ada record yang ditemukan atau terjadi error saat query.")
             db.disconnect()
-            
+                
             # Convert SQLAlchemy objects to dictionaries
             data = []
             for record in records:
                 data.append({
                     "date_time": record.date_time,
-                    "symbol": record.symbol,
+                    "s": record.symbol,
                     "open": record.open,
                     "high": record.high,
                     "low": record.low,

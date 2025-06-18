@@ -5,6 +5,7 @@ init-db.sql
 init-db.sh
 plugins
 config
+data
 ~
 
 src/__pycache__
