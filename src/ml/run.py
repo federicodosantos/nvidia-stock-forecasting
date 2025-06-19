@@ -4,6 +4,7 @@ from pyspark.sql import SparkSession
 from dotenv import load_dotenv
 from src.ml.train import ARIMAStockForecaster
 import pandas as pd
+from src.ml.preprocessing import preprocess_stock_data
 
 # Load environment variables
 load_dotenv()
@@ -39,12 +40,29 @@ def main():
         .getOrCreate()
     
     try:
+
+        logger.info("Running data preprocessing")
+        preprocessed_df = preprocess_stock_data(spark, data_source="postgres", target_column="high")
+        df = preprocessed_df.toPandas()
+        df.to_csv('src/ml/result/nvidia_stock_high_preprocessed.csv', index=False)
+
+        # Konversi ke Pandas DataFrame
+        logger.info("Converting preprocessed data to Pandas DataFrame")
+        pandas_df = preprocessed_df.select("date_time", "high").toPandas()
+        pandas_df["date_time"] = pd.to_datetime(pandas_df["date_time"])
+        pandas_df.set_index("date_time", inplace=True)
+        pandas_df.sort_index(inplace=True)
+        
+        # Resample menjadi per jam dan forward fill jika ada missing
+        pandas_df = pandas_df.resample('1H').mean().ffill()
+
         # Initialize forecaster
         forecaster = ARIMAStockForecaster(spark_session=spark)
+        forecaster.data = pandas_df
         
         # Prepare data
         logger.info("Preparing data for forecasting")
-        train_data, test_data = forecaster.prepare_data(test_size=0.2)
+        train_data, test_data = forecaster.prepare_data_from_preprocessed(test_size=0.2)
         
         # Fit ARIMA model
         logger.info("Fitting ARIMA model")

@@ -16,6 +16,7 @@ class ARIMAStockForecaster:
         self.train_data = None
         self.test_data = None
         self.model = None
+        self.fitted_model = None
         self.order = (1, 1, 1)  # Default order (p,d,q)
         self.differencing = 0
         # Create results directory if it doesn't exist
@@ -82,6 +83,52 @@ class ARIMAStockForecaster:
         else:
             raise Exception("Failed to connect to database")
     
+    def prepare_data_from_preprocessed(self, test_size=0.2):
+        """Prepare data for modeling from preprocessed data"""
+        if self.data is None:
+            raise ValueError("Data not set. Use preprocessed data.")
+        
+        # Use high price for forecasting
+        series = self.data['high']
+        
+        # Check if we have enough data
+        if len(series) < 10:
+            print("Warning: Very few data points available for analysis")
+        
+        # Check stationarity and make stationary if needed
+        stationary_series, diff_order = self.make_stationary(series)
+        
+        # Plot ACF and PACF with appropriate lags
+        max_lags = min(40, len(stationary_series) // 2)
+        if max_lags > 0:
+            self.plot_acf_pacf(stationary_series, max_lags=max_lags)
+        else:
+            print("Warning: Not enough data points for ACF/PACF plots")
+        
+        # Split into train and test sets
+        split_idx = int(len(series) * (1 - test_size))
+        if split_idx <= 0:
+            # If too few points, use all for training
+            self.train_data = series
+            self.test_data = series.iloc[-1:]  # Use last point for testing
+            print("Warning: Too few data points. Using all data for training.")
+        else:
+            self.train_data = series[:split_idx]
+            self.test_data = series[split_idx:]
+        
+        # Find best parameters if we have enough data
+        if len(self.train_data) >= 3:
+            self.find_best_parameters()
+        else:
+            # Use default parameters for very small datasets
+            self.order = (1, diff_order, 0)
+            print(f"Warning: Too few data points for parameter search. Using default order {self.order}")
+        
+        print(f"Training data: {len(self.train_data)} records")
+        print(f"Testing data: {len(self.test_data)} records")
+        
+        return self.train_data, self.test_data
+
     def check_stationarity(self, series):
         """Test stationarity using Augmented Dickey-Fuller test"""
         result = adfuller(series.dropna())
@@ -287,14 +334,11 @@ class ARIMAStockForecaster:
                 forecast_dates = forecast_dates[:len(forecast_mean)]
             elif len(forecast_dates) < len(forecast_mean):
                 forecast_mean = forecast_mean[:len(forecast_dates)]
-                forecast_ci = forecast_ci.iloc[:len(forecast_dates)]
             
             # Create DataFrame with proper index
             forecast_df = pd.DataFrame({
-                'forecast': forecast_mean.values if hasattr(forecast_mean, 'values') else forecast_mean,
-                'lower_ci': forecast_ci.iloc[:, 0].values if hasattr(forecast_ci, 'iloc') else forecast_ci[:, 0],
-                'upper_ci': forecast_ci.iloc[:, 1].values if hasattr(forecast_ci, 'iloc') else forecast_ci[:, 1]
-            }, index=forecast_dates)
+                'forecast': forecast_mean.values if hasattr(forecast_mean, 'values') else forecast_mean},
+            index=forecast_dates)
             
             return forecast_df
         
